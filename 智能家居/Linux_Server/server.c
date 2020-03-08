@@ -60,71 +60,77 @@ char *get_json_string_filed(const char *json_data, const char *filed)
 
 	return str;
 }
-
-void control_device1(int controlStatu)
+/*
+void change_password(char *username, char *newPassword)
 {
-	FILE *fp;
-	fp = fopen("/sys/class/leds/fs4412-led1/brightness", "w");
-	if(controlStatu == 0){
-		printf("Open device 1\n");
-		fputs("1", fp);
-	}else{
-		printf("Close device 1\n");
-		fputs("0", fp);
+	FILE *fp1, *fp2;
+	fp1 = fopen("user.txt", "r");
+	if(fp1 = NULL){
+		printf("Fail to open file.");
+		return;
+	}
+	fp2 = fopen("user2.txt", "w+");
+	if(fp2 = NULL){
+		printf("Fail to open file.");
+		return;
+	}
+	while(1){
+		char _username[100];
+		char _password[100];
+		char _telphone[100];
+		char _useremail[100];
+		int ret = fscanf(fp1, "%[^:]:%[^:]:%[^:]:%s\n", _username, _password, _useremail, _telphone);
+		if(ret == EOF){
+			break;
+		}
+		if(strcmp(username, _username) == 0){
+			fprintf(fp2, "%s:%s:%s:%s\n", _username, newPassword, _useremail, _telphone);
+			continue;
+		}
+		fprintf(fp2, "%s:%s:%s:%s\n", _username, _password, _useremail, _telphone);
 	}
 	
-	fclose(fp);
+	fclose(fp1);
+	fclose(fp2);
+	free(username);
+	free(newPassword);
+	system("rm user.txt");
+	system("mv user2.txt user.txt");
 	
-	return;
+}
+*/
+void control_device1(int controlStatu)
+{
+	if(controlStatu == 0){
+		printf("Open device 1\n");
+	}else{
+		printf("Close device 1\n");
+	}
 }
 
 void control_device2(int controlStatu)
 {
-	FILE *fp;
-	fp = fopen("/sys/class/leds/fs4412-led2/brightness", "w");
 	if(controlStatu == 0){
 		printf("Open device 2\n");
-		fputs("1", fp);
 	}else{
 		printf("Close device 2\n");
-		fputs("0", fp);
 	}
-	
-	fclose(fp);
-	
-	return;
 }
 void control_device3(int controlStatu)
 {
-	FILE *fp;
-	fp = fopen("/sys/class/leds/fs4412-led3/brightness", "w");
 	if(controlStatu == 0){
 		printf("Open device 3\n");
-		fputs("1", fp);
 	}else{
 		printf("Close device 3\n");
-		fputs("0", fp);
 	}
-	
-	fclose(fp);
-	
-	return;
 }
 void control_device4(int controlStatu)
 {
-	FILE *fp;
-	fp = fopen("/sys/class/backlight/beep-backlight.6/brightness", "w");
 	if(controlStatu == 0){
 		printf("Open device 4\n");
-		fputs("6", fp);
 	}else{
 		printf("Close device 4\n");
-		fputs("0", fp);
 	}
-	
-	fclose(fp);
-	
-	return;
 }
 
 void ack_client_register(int sockfd, int exist_flag)
@@ -134,6 +140,7 @@ void ack_client_register(int sockfd, int exist_flag)
 	json_object *jobject;
 
 	jobject = json_object_new_object();
+	json_object_object_add(jobject, "functionId", json_object_new_int(1));
 	json_object_object_add(jobject, "statu", json_object_new_int(exist_flag));
 	if(exist_flag){
 		error_string = "The user is exist!";
@@ -157,11 +164,11 @@ void ack_client_login(int sockfd, int exist_flag)
 	json_object *jobject;
 
 	jobject = json_object_new_object();
+	json_object_object_add(jobject, "functionId", json_object_new_int(2));
 	json_object_object_add(jobject, "statu", json_object_new_int(exist_flag));
-	if(exist_flag == 3){
+	if(exist_flag){
 		error_string = "Wrong user or password!";
-	}
-	if(exist_flag == 2){
+	}else{
 		char clientId[100];
 		error_string = "";
 		sprintf(clientId, "%d", getppid());
@@ -198,6 +205,63 @@ void control_device(int deviceId, int controlStatu)
 	}
 }
 
+void ack_client_reset(int sockfd, int exist_flag)
+{
+	const char *json_data;
+	char *error_string;
+	json_object *jobject;
+
+	jobject = json_object_new_object();
+	json_object_object_add(jobject, "functionId", json_object_new_int(4));
+	json_object_object_add(jobject, "statu", json_object_new_int(exist_flag));
+	if(exist_flag == 1){
+		error_string = "Your username or oldpassword is wrong!";
+	}
+	if(exist_flag == 0){
+		error_string = "";
+	}
+
+	json_object_object_add(jobject, "error", json_object_new_string(error_string));
+
+	json_data = json_object_to_json_string(jobject);
+
+	write(sockfd, json_data, strlen(json_data));
+	json_object_put(jobject);
+
+	return;
+	
+}
+
+
+void ack_client_forget(int sockfd, int exist_flag)
+{
+	const char *json_data;
+	char *error_string;
+	json_object *jobject;
+
+	jobject = json_object_new_object();
+	json_object_object_add(jobject, "functionId", json_object_new_int(5));
+	json_object_object_add(jobject, "statu", json_object_new_int(exist_flag));
+	if(exist_flag == 1){
+		error_string = "Your information is Wrong!";
+	}
+	if(exist_flag == 0){
+		error_string = "";
+	}
+
+	json_object_object_add(jobject, "error", json_object_new_string(error_string));
+
+	json_data = json_object_to_json_string(jobject);
+
+	write(sockfd, json_data, strlen(json_data));
+	json_object_put(jobject);
+
+	return;
+	
+}
+
+
+
 void client_register(int sockfd, const char *json_data)
 {
 	FILE *fp;
@@ -230,7 +294,7 @@ void client_register(int sockfd, const char *json_data)
 	}
 	
 	//save user's information to user.txt
-	fprintf(fp, "%s:%s:%s:%s\n", username, password, telphone, useremail);
+	fprintf(fp, "%s:%s:%s:%s\n", username, password, useremail, telphone);
 
 next:
 	fclose(fp);
@@ -246,7 +310,7 @@ next:
 void client_login(int sockfd, const char *json_data)
 {
 	FILE *fp;
-	int exist_flag = 3;
+	int exist_flag = 1;
 	char *username = get_json_string_filed(json_data, "username");
 	char *password = get_json_string_filed(json_data, "password");
 
@@ -269,7 +333,7 @@ void client_login(int sockfd, const char *json_data)
 
 		if((strcmp(username, _username) == 0) && (strcmp(password, _password) == 0))
 		{
-			exist_flag = 2;
+			exist_flag = 0;
 		}
 	}
 	fclose(fp);
@@ -300,47 +364,151 @@ void client_control_device(int sockfd, const char *json_data)
 	deviceId = get_json_int_filed(json_data, "deviceId");
 
 	control_device(deviceId, controlStatu);
-
-	printf("clientId : %s\n", clientId);
-	printf("controlStatu: %d\n", controlStatu);
-	printf("deviceId : %d\n", deviceId);
-
 	free(clientId);
 
 	return;
 }
 
-void process_task(int sockfd, const char *json_data)
+void client_resetPassword(int sockfd, const char *json_data)
 {
-	char *email, *clientId;
-	email = get_json_string_filed(json_data, "email");
-	clientId = get_json_string_filed(json_data, "clientId");
-/*
-	if(email != NULL){
-		printf("email :%s\n", email);
-	}
-	if(clientId != NULL){
-		printf("clientId :%s\n", clientId);
-	}
-*/
-	if(clientId != NULL){
-		//device function
-		client_control_device(sockfd, json_data);
-		return;
-	}
-	if((strlen(email) == 0) && clientId == NULL ){
-		//client login
-		client_login(sockfd, json_data);
-		return;
-	}
-	if(email != NULL && clientId == NULL){
-		//register function
-		client_register(sockfd, json_data);
+	FILE *fp1, *fp2;
+	char *username = get_json_string_filed(json_data, "username");
+	char *oldPassword = get_json_string_filed(json_data, "oldPassword");
+	char *newPassword = get_json_string_filed(json_data, "newPassword");
+	int exist_flag = 1;
+
+	fp1 = fopen("user.txt", "r+");
+	if(fp1 == NULL){
+		perror("Fail to open file.");
 		return;
 	}
 
-	free(email);
-	free(clientId);
+	fp2 = fopen("user2.txt", "w+");
+	if(fp2 == NULL){
+		perror("Fail to open file.");
+		return;
+	}
+	
+	while(1){
+		char _username[100];
+		char _oldPassword[100];
+		char _useremail[100];
+		char _telphone[100];
+
+		int ret = fscanf(fp1, "%[^:]:%[^:]:%[^:]:%s\n", _username, _oldPassword, _useremail, _telphone);
+		if(ret == EOF){
+			break;
+		}
+		
+		if(((strcmp(username, _username) == 0) && (strcmp(oldPassword, _oldPassword) == 0)))
+		{
+			fprintf(fp2, "%s:%s:%s:%s\n", username, newPassword, _useremail, _telphone);
+			exist_flag = 0;
+			continue;
+		}
+		fprintf(fp2, "%s:%s:%s:%s\n", username, _oldPassword, _useremail, _telphone);
+	}
+
+	fclose(fp1);
+	fclose(fp2);
+	system("rm user.txt");
+	system("mv user2.txt user.txt");
+	free(username);
+	free(oldPassword);
+	free(newPassword);
+	ack_client_reset(sockfd, exist_flag);
+
+	return;
+
+}
+
+void client_forgetPassword(int sockfd, const char *json_data)
+{
+	FILE *fp1,*fp2;
+	char *username = get_json_string_filed(json_data, "username");
+	char *useremail = get_json_string_filed(json_data, "useremail");
+	char *telphone = get_json_string_filed(json_data, "telphone");
+	char *newPassword = get_json_string_filed(json_data, "newPassword");
+	int exist_flag = 1;
+
+	fp1 = fopen("user.txt", "r+");
+	if(fp1 == NULL){
+		perror("Fail to open file.");
+		return;
+	}
+
+	fp2 = fopen("user2.txt", "w+");
+	if(fp2 == NULL){
+		perror("Fail to open file.");
+		return;
+	}
+	
+	while(1){
+		char _username[100];
+		char _oldPassword[100];
+		char _useremail[100];
+		char _telphone[100];
+
+		int ret = fscanf(fp1, "%[^:]:%[^:]:%[^:]:%s\n", _username, _oldPassword, _useremail, _telphone);
+		if(ret == EOF){
+			break;
+		}
+
+		if((strcmp(username, _username) == 0) && (strcmp(useremail, _useremail) == 0) && (strcmp(telphone, _telphone) == 0))
+		{
+			fprintf(fp2, "%s:%s:%s:%s\n", username, newPassword, _useremail, _telphone);
+			exist_flag = 0;
+			continue;
+		}
+		fprintf(fp2, "%s:%s:%s:%s\n", username, _oldPassword, _useremail, _telphone);
+	}
+
+
+	fclose(fp1);
+	fclose(fp2);
+	system("rm user.txt");
+	system("mv user2.txt user.txt");
+	free(username);
+	free(telphone);
+	free(useremail);
+	free(newPassword);
+	ack_client_forget(sockfd, exist_flag);
+
+	return;
+
+}
+
+	
+
+
+void process_task(int sockfd, const char *json_data)
+{
+	int functionId;
+
+	functionId = get_json_int_filed(json_data, "functionId");
+	if(functionId < 0){
+		return;
+	}
+
+	switch(functionId){
+		case 1:
+			client_register(sockfd, json_data);
+			break;
+		case 2:
+			client_login(sockfd, json_data);
+			break;
+		case 3:
+			client_control_device(sockfd, json_data);
+			break;
+		case 4:
+			client_resetPassword(sockfd, json_data);
+			break;
+		case 5:
+			client_forgetPassword(sockfd, json_data);
+			break;
+		default:
+			break;
+	}
 	return;
 }
 
@@ -389,8 +557,7 @@ int main(int argc, const char *argv[])
 	//2.Server address
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(8080);
-	server_addr.sin_addr.s_addr = 0;
-	//server_addr.sin_addr.s_addr = inet_addr("192.168.43.129");
+	server_addr.sin_addr.s_addr = inet_addr("192.168.43.128");
 	
 	//3.Bind server address
 	ret = bind(listenfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
