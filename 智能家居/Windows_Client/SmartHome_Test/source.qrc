@@ -1,0 +1,62 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/login/farsight.png</file>
+        <file>image/login/login_bj.png</file>
+        <file>image/login/loging_button_bj.png</file>
+        <file>image/login/登录.jpg</file>
+        <file>image/login/管理员.png</file>
+        <file>image/login/图片1.png</file>
+        <file>image/login/图片2.png</file>
+        <file>image/login/图片3.png</file>
+        <file>image/login/图片4.png</file>
+        <file>image/login/登录 (1).png</file>
+        <file>image/login/登录 (2).png</file>
+        <file>image/login/登录.png</file>
+        <file>image/login/登录页面-密码.png</file>
+        <file>image/login/登录用户.png</file>
+        <file>image/login/登录用户名.png</file>
+        <file>image/login/登录 (3).png</file>
+        <file>image/login/登录 (4).png</file>
+        <file>image/login/服务器IP申请.png</file>
+        <file>image/login/登录7.png</file>
+        <file>image/function/wdj.png</file>
+        <file>image/function/youxiang.png</file>
+        <file>image/function/光照度.png</file>
+        <file>image/major/admin_ico.png</file>
+        <file>image/major/dev_button_ico.png</file>
+        <file>image/major/email_no_ico.png</file>
+        <file>image/major/email_yes_ico.png</file>
+        <file>image/major/farfight_logo.png</file>
+        <file>image/major/home_bh.png</file>
+        <file>image/major/home_ico.png</file>
+        <file>image/major/humidity_button_ico.png</file>
+        <file>image/major/illumination_button_ico.png</file>
+        <file>image/major/meadioplayer_button_ico.png</file>
+        <file>image/major/pellet_ico.png</file>
+        <file>image/major/temperature_button_ico.png</file>
+        <file>image/major/video_button_ico.png</file>
+        <file>image/major/yule_button_ico.png</file>
+        <file>image/major/智能家居主界面.jpg</file>
+        <file>image/function/用户 (1).png</file>
+        <file>image/function/主页 (4).png</file>
+        <file>image/function/多媒体教室申请.png</file>
+        <file>image/function/监控 (1).png</file>
+        <file>image/function/设置.png</file>
+        <file>image/function/娱乐信息.png</file>
+        <file>image/function/above-atmosphere-clouds-37728.jpg</file>
+        <file>image/function/幻灯片1.PNG</file>
+        <file>image/function/幻灯片2.PNG</file>
+        <file>image/function/shidu.png</file>
+        <file>image/function/图片2.png</file>
+        <file>image/room/closedoor_ico.png</file>
+        <file>image/room/closefan_ico.png</file>
+        <file>image/room/closeled_ico.png</file>
+        <file>image/room/OFF.png</file>
+        <file>image/room/ON.png</file>
+        <file>image/room/opendoor_ico.png</file>
+        <file>image/room/openfan_ico.png</file>
+        <file>image/room/openled_ico.png</file>
+        <file>image/room/房间主背景.jpg</file>
+        <file>image/function/透明.png</file>
+    </qresource>
+</RCC>
